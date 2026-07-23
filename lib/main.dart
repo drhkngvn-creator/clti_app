@@ -17,8 +17,14 @@ class CltiApp extends StatelessWidget {
     return MaterialApp(
       title: 'CLTI Decision Support',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF121212), // Koyu gri zemin
+        colorScheme: ColorScheme.dark(
+          primary: const Color(0xFFFFA000), // Turuncuya yakın sarı (Amber)
+          onPrimary: Colors.black,
+          surface: const Color(0xFF1E1E1E), // Kartlar için koyu ton
+        ),
+        useMaterial3: true,
       ),
       home: HomeScreen(),
       debugShowCheckedModeBanner: false,
@@ -46,6 +52,9 @@ class _HomeScreenState extends State<HomeScreen> {
       body: _screens[_currentIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _currentIndex,
+        selectedItemColor: const Color(0xFFFFA000),
+        unselectedItemColor: Colors.grey,
+        backgroundColor: const Color(0xFF1E1E1E),
         onTap: (index) {
           setState(() {
             _currentIndex = index;
@@ -112,10 +121,11 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Text('Yara, İskemi ve Enfeksiyon Derecelendirmesi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Yara, İskemi ve Enfeksiyon Derecelendirmesi', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(height: 20),
             DropdownButtonFormField<int>(
               value: selectedWound,
+              dropdownColor: const Color(0xFF1E1E1E),
               decoration: InputDecoration(labelText: 'Wound (W - Yara / Gangren)'),
               items: [
                 DropdownMenuItem(value: 0, child: Text('Grade 0: Yara yok / Rest pain')),
@@ -128,6 +138,7 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
             SizedBox(height: 20),
             DropdownButtonFormField<int>(
               value: selectedIschemia,
+              dropdownColor: const Color(0xFF1E1E1E),
               decoration: InputDecoration(labelText: 'Ischemia (I - İskemi / Hemodinami)'),
               items: [
                 DropdownMenuItem(value: 0, child: Text('Grade 0: ABI > 0.8 | Basınç > 100 mmHg')),
@@ -140,6 +151,7 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
             SizedBox(height: 20),
             DropdownButtonFormField<int>(
               value: selectedInfection,
+              dropdownColor: const Color(0xFF1E1E1E),
               decoration: InputDecoration(labelText: 'Foot Infection (fI - Enfeksiyon)'),
               items: [
                 DropdownMenuItem(value: 0, child: Text('Grade 0: Enfeksiyon bulgusu yok')),
@@ -151,14 +163,22 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
             ),
             SizedBox(height: 30),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFA000),
+                foregroundColor: Colors.black,
+              ),
               onPressed: calculateWifI,
               child: Text('WIfI Evresini Hesapla ve Kaydet'),
             ),
             SizedBox(height: 20),
             Container(
               padding: EdgeInsets.all(16),
-              color: Colors.blue.shade50,
-              child: Text('Sonuç: $calculatedWifiStage\n(Otomatik olarak PLAN adımına aktarıldı.)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFFA000).withOpacity(0.5)),
+              ),
+              child: Text('Sonuç: $calculatedWifiStage\n(Otomatik olarak PLAN adımına aktarıldı.)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFFFFA000))),
             ),
           ],
         ),
@@ -203,10 +223,11 @@ class _GlassCalculatorScreenState extends State<GlassCalculatorScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Text('Anatomik Karmaşıklık Evrelemesi (GLASS)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Anatomik Karmaşıklık Evrelemesi (GLASS)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(height: 20),
             DropdownButtonFormField<int>(
               value: fpGrade,
+              dropdownColor: const Color(0xFF1E1E1E),
               decoration: InputDecoration(labelText: 'Femoropopliteal (FP) Segment Hastalığı'),
               items: [
                 DropdownMenuItem(value: 0, child: Text('FP Grade 0: Normal veya <%50 hafif darlık')),
@@ -220,6 +241,7 @@ class _GlassCalculatorScreenState extends State<GlassCalculatorScreen> {
             SizedBox(height: 20),
             DropdownButtonFormField<int>(
               value: ipGrade,
+              dropdownColor: const Color(0xFF1E1E1E),
               decoration: InputDecoration(labelText: 'Infrapopliteal (IP - Hedef Arter Yolu)'),
               items: [
                 DropdownMenuItem(value: 0, child: Text('IP Grade 0: Hedef damarda normal / hafif darlık')),
@@ -232,14 +254,22 @@ class _GlassCalculatorScreenState extends State<GlassCalculatorScreen> {
             ),
             SizedBox(height: 30),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFA000),
+                foregroundColor: Colors.black,
+              ),
               onPressed: calculateGlass,
               child: Text('GLASS Evresini Hesapla ve Kaydet'),
             ),
             SizedBox(height: 20),
             Container(
               padding: EdgeInsets.all(16),
-              color: Colors.green.shade50,
-              child: Text('GLASS Sonucu: $calculatedGlassStage\n(Otomatik olarak PLAN adımına aktarıldı.)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFFA000).withOpacity(0.5)),
+              ),
+              child: Text('GLASS Sonucu: $calculatedGlassStage\n(Otomatik olarak PLAN adımına aktarıldı.)', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFFFFA000))),
             ),
           ],
         ),
@@ -294,23 +324,27 @@ class _PlanStrategyScreenState extends State<PlanStrategyScreen> {
         padding: const EdgeInsets.all(16.0),
         child: ListView(
           children: [
-            Text('Klinik Karar ve Tedavi Planı (Otomatik Entegrasyon)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+            Text('Klinik Karar ve Tedavi Planı (Otomatik Entegrasyon)', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
             SizedBox(height: 15),
             Container(
               padding: EdgeInsets.all(12),
-              color: Colors.grey.shade200,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(8),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('1. Adımdan Gelen WIfI: ${SharedAppData.wifiText}', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue.shade800)),
+                  Text('1. Adımdan Gelen WIfI: ${SharedAppData.wifiText}', style: TextStyle(fontWeight: FontWeight.bold, color: const Color(0xFFFFA000))),
                   SizedBox(height: 5),
-                  Text('2. Adımdan Gelen GLASS: ${SharedAppData.glassText}', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.green.shade800)),
+                  Text('2. Adımdan Gelen GLASS: ${SharedAppData.glassText}', style: TextStyle(fontWeight: FontWeight.bold, color: const Color(0xFFFFA000))),
                 ],
               ),
             ),
             SizedBox(height: 20),
             DropdownButtonFormField<String>(
               value: patientRisk,
+              dropdownColor: const Color(0xFF1E1E1E),
               decoration: InputDecoration(labelText: 'Hasta Cerrahi Riski (ASA / Komorbidite)'),
               items: [
                 DropdownMenuItem(value: "Average Risk", child: Text('Average Risk (Standart Cerrahi Adayı)')),
@@ -320,26 +354,33 @@ class _PlanStrategyScreenState extends State<PlanStrategyScreen> {
             ),
             SizedBox(height: 30),
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: Colors.orange.shade800),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFFFA000),
+                foregroundColor: Colors.black,
+              ),
               onPressed: generatePlan,
-              child: Text('PLAN Stratejisini ve Kanıtları Üret', style: TextStyle(color: Colors.white)),
+              child: Text('PLAN Stratejisini ve Kanıtları Üret', style: TextStyle(fontWeight: FontWeight.bold)),
             ),
             SizedBox(height: 20),
             Container(
               padding: EdgeInsets.all(16),
-              color: Colors.orange.shade50,
+              decoration: BoxDecoration(
+                color: const Color(0xFF1E1E1E),
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: const Color(0xFFFFA000).withOpacity(0.5)),
+              ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('Önerilen Tedavi Planı:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87)),
+                  Text('Önerilen Tedavi Planı:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                   SizedBox(height: 8),
-                  Text(treatmentPlanResult, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: Colors.orange.shade900)),
+                  Text(treatmentPlanResult, style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold, color: const Color(0xFFFFA000))),
                   SizedBox(height: 12),
-                  Divider(color: Colors.orange.shade300),
+                  Divider(color: Colors.grey.shade700),
                   SizedBox(height: 6),
-                  Text('Kılavuz Gerekçesi ve Referanslar:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black54)),
+                  Text('Kılavuz Gerekçesi ve Referanslar:', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey.shade400)),
                   SizedBox(height: 4),
-                  Text(referenceExplanation, style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.black87)),
+                  Text(referenceExplanation, style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey.shade300)),
                 ],
               ),
             ),
