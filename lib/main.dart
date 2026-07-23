@@ -1,4 +1,8 @@
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:open_filex/open_filex.dart';
 
 void main() {
   runApp(CltiApp());
@@ -42,14 +46,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
-
-  // Dil değiştiğinde tüm ekranların anında yeniden çizilmesi için key kullanıyoruz
   Key _screenKey = UniqueKey();
 
   void _toggleLanguage() {
     setState(() {
       AppData.isEnglish = !AppData.isEnglish;
-      _screenKey = UniqueKey(); // Tüm sayfaları yenilemek için key'i değiştiriyoruz
+      _screenKey = UniqueKey();
     });
   }
 
@@ -59,6 +61,7 @@ class _HomeScreenState extends State<HomeScreen> {
       WifiCalculatorScreen(key: _screenKey),
       GlassCalculatorScreen(key: _screenKey),
       PlanStrategyScreen(key: _screenKey),
+      InfoReferencesScreen(key: _screenKey),
     ];
 
     return Scaffold(
@@ -87,6 +90,7 @@ class _HomeScreenState extends State<HomeScreen> {
         selectedItemColor: const Color(0xFFFFA000),
         unselectedItemColor: Colors.grey,
         backgroundColor: const Color(0xFF1E1E1E),
+        type: BottomNavigationBarType.fixed,
         onTap: (index) {
           setState(() {
             _currentIndex = index;
@@ -95,15 +99,19 @@ class _HomeScreenState extends State<HomeScreen> {
         items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.healing),
-            label: AppData.isEnglish ? '1. WIfI' : '1. WIfI',
+            label: 'WIfI',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.analytics),
-            label: AppData.isEnglish ? '2. GLASS' : '2. GLASS',
+            label: 'GLASS',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.assignment_turned_in),
-            label: AppData.isEnglish ? '3. PLAN' : '3. PLAN',
+            label: 'PLAN',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.info_outline),
+            label: AppData.isEnglish ? 'Info & Ref' : 'Bilgi & Kaynak',
           ),
         ],
       ),
@@ -113,7 +121,6 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class WifiCalculatorScreen extends StatefulWidget {
   const WifiCalculatorScreen({Key? key}) : super(key: key);
-
   @override
   _WifiCalculatorScreenState createState() => _WifiCalculatorScreenState();
 }
@@ -162,7 +169,7 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
       child: ListView(
         children: [
           Text(
-            en ? 'Wound, Ischemia, and foot Infection Grading' : 'Yara, İskemi ve Enfeksiyon Derecelendirmesi',
+            en ? 'Wound, Ischemia, and foot Infection Grading (WIfI)' : 'Yara, İskemi ve Ayak Enfeksiyonu Derecelendirmesi (WIfI)',
             style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           SizedBox(height: 20),
@@ -236,7 +243,6 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
 
 class GlassCalculatorScreen extends StatefulWidget {
   const GlassCalculatorScreen({Key? key}) : super(key: key);
-
   @override
   _GlassCalculatorScreenState createState() => _GlassCalculatorScreenState();
 }
@@ -342,7 +348,6 @@ class _GlassCalculatorScreenState extends State<GlassCalculatorScreen> {
 
 class PlanStrategyScreen extends StatefulWidget {
   const PlanStrategyScreen({Key? key}) : super(key: key);
-
   @override
   _PlanStrategyScreenState createState() => _PlanStrategyScreenState();
 }
@@ -473,6 +478,103 @@ class _PlanStrategyScreenState extends State<PlanStrategyScreen> {
                   style: TextStyle(fontSize: 13, fontStyle: FontStyle.italic, color: Colors.grey.shade300),
                 ),
               ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class InfoReferencesScreen extends StatelessWidget {
+  const InfoReferencesScreen({Key? key}) : super(key: key);
+
+  Future<void> _openPdf(BuildContext context, String assetName) async {
+    try {
+      final ByteData data = await rootBundle.load('assets/$assetName');
+      final Directory tempDir = await getTemporaryDirectory();
+      final File file = File('${tempDir.path}/$assetName');
+      
+      await file.writeAsBytes(data.buffer.asUint8List(), flush: true);
+      
+      final result = await OpenFilex.open(file.path);
+      if (result.type != ResultType.done) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('PDF açılamadı: ${result.message}')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Bir hata oluştu: $e')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    bool en = AppData.isEnglish;
+    return Padding(
+      padding: const EdgeInsets.all(16.0),
+      child: ListView(
+        children: [
+          Text(
+            en ? 'Official Guidelines & References' : 'Resmi Kılavuzlar ve Kaynaklar',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          SizedBox(height: 15),
+          Card(
+            color: const Color(0xFF1E1E1E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: ListTile(
+              leading: Icon(Icons.picture_as_pdf, color: Color(0xFFFFA000), size: 36),
+              title: Text(
+                en ? 'Global Vascular Guidelines (GVG)' : 'Global Vasküler Kılavuzlar (GVG)',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              subtitle: Text(
+                en ? 'Tap to open embedded GVG main document (Conte MS et al.)' : 'Gömülü GVG ana dokümanını açmak için tıklayın',
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+              ),
+              trailing: Icon(Icons.open_in_new, color: Color(0xFFFFA000)),
+              onTap: () => _openPdf(context, 'GVG.pdf'),
+            ),
+          ),
+          SizedBox(height: 10),
+          Card(
+            color: const Color(0xFF1E1E1E),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+            child: ListTile(
+              leading: Icon(Icons.picture_as_pdf, color: Color(0xFFFFA000), size: 36),
+              title: Text(
+                en ? 'SVS WIfI Classification System' : 'SVS WIfI Sınıflandırma Sistemi',
+                style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+              ),
+              subtitle: Text(
+                en ? 'Tap to open embedded WIfI original article (Mills JL et al.)' : 'Gömülü WIfI orijinal makalesini açmak için tıklayın',
+                style: TextStyle(color: Colors.grey.shade400, fontSize: 13),
+              ),
+              trailing: Icon(Icons.open_in_new, color: Color(0xFFFFA000)),
+              onTap: () => _openPdf(context, 'WIFI.pdf'),
+            ),
+          ),
+          SizedBox(height: 25),
+          Text(
+            en ? 'Legal & Clinical Disclaimer' : 'Yasal ve Klinik Uyarı',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+          ),
+          SizedBox(height: 15),
+          Container(
+            padding: EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: const Color(0xFF1E1E1E),
+              borderRadius: BorderRadius.circular(8),
+              border: Border.all(color: Colors.red.shade700.withOpacity(0.6)),
+            ),
+            child: Text(
+              en
+                  ? 'Disclaimer: This application is designed strictly for clinical decision support and educational purposes for healthcare professionals, based on the Global Vascular Guidelines (GVG) on the Management of Chronic Limb-Threatening Ischemia (Conte MS et al., 2019) and SVS WIfI Classification (Mills JL et al., 2014). Final treatment decisions, risk evaluations, and surgical planning must be made by qualified physicians based on individual patient assessment. The developers assume no liability for clinical outcomes.'
+                  : 'Uyarı: Bu uygulama yalnızca sağlık profesyonelleri için klinik karar destek ve eğitim amaçlı olarak Global Vascular Guidelines (GVG) ve SVS WIfI Sınıflandırma kılavuzlarına dayanılarak tasarlanmıştır. Nihai tedavi kararları, risk değerlendirmeleri ve cerrahi planlamalar, hastanın bireysel durumuna göre yetkili hekimler tarafından yapılmalıdır. Geliştiriciler klinik sonuçlar için hiçbir sorumluluk kabul etmez.',
+              style: TextStyle(fontSize: 14, color: Colors.grey.shade300, height: 1.4),
             ),
           ),
         ],
