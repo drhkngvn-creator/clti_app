@@ -4,9 +4,8 @@ void main() {
   runApp(CltiApp());
 }
 
-// Uygulama genelinde dil ve veri yönetimi
 class AppData {
-  static bool isEnglish = true; // Varsayılan İngilizce
+  static bool isEnglish = true;
   static int wifiStageNum = 1;
   static int glassStageNum = 1;
   static String wifiTextEn = "Stage 1 (Very Low Risk)";
@@ -44,20 +43,24 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    WifiCalculatorScreen(),
-    GlassCalculatorScreen(),
-    PlanStrategyScreen(),
-  ];
+  // Dil değiştiğinde tüm ekranların anında yeniden çizilmesi için key kullanıyoruz
+  Key _screenKey = UniqueKey();
 
   void _toggleLanguage() {
     setState(() {
       AppData.isEnglish = !AppData.isEnglish;
+      _screenKey = UniqueKey(); // Tüm sayfaları yenilemek için key'i değiştiriyoruz
     });
   }
 
   @override
   Widget build(BuildContext context) {
+    final List<Widget> _screens = [
+      WifiCalculatorScreen(key: _screenKey),
+      GlassCalculatorScreen(key: _screenKey),
+      PlanStrategyScreen(key: _screenKey),
+    ];
+
     return Scaffold(
       appBar: AppBar(
         title: Text(AppData.isEnglish ? 'CLTI Decision Support' : 'CLTI Karar Destek'),
@@ -109,6 +112,8 @@ class _HomeScreenState extends State<HomeScreen> {
 }
 
 class WifiCalculatorScreen extends StatefulWidget {
+  const WifiCalculatorScreen({Key? key}) : super(key: key);
+
   @override
   _WifiCalculatorScreenState createState() => _WifiCalculatorScreenState();
 }
@@ -230,6 +235,8 @@ class _WifiCalculatorScreenState extends State<WifiCalculatorScreen> {
 }
 
 class GlassCalculatorScreen extends StatefulWidget {
+  const GlassCalculatorScreen({Key? key}) : super(key: key);
+
   @override
   _GlassCalculatorScreenState createState() => _GlassCalculatorScreenState();
 }
@@ -334,6 +341,8 @@ class _GlassCalculatorScreenState extends State<GlassCalculatorScreen> {
 }
 
 class PlanStrategyScreen extends StatefulWidget {
+  const PlanStrategyScreen({Key? key}) : super(key: key);
+
   @override
   _PlanStrategyScreenState createState() => _PlanStrategyScreenState();
 }
@@ -420,7 +429,7 @@ class _PlanStrategyScreenState extends State<PlanStrategyScreen> {
             onChanged: (val) => setState(() => patientRisk = val!),
           ),
           SizedBox(height: 30),
-            ElevatedButton(
+          ElevatedButton(
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFFFFA000),
               foregroundColor: Colors.black,
